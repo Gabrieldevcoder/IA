@@ -15,20 +15,22 @@ function addMessageToChatbox(message) {
   chatbox.scrollTop = chatbox.scrollHeight;
 }
 
-function generateChatbotResponse(userInput) {
-  var response = 'Chatbot: ' + generateResponse(userInput);
-  setTimeout(function() {
-    addMessageToChatbox(response);
-  }, 1000);
+async function generateChatbotResponse(userInput) {
+  const response = await fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer YOUR_OPENAI_API_KEY`
+    },
+    body: JSON.stringify({
+      prompt: userInput,
+      max_tokens: 150
+    })
+  });
+
+  const data = await response.json();
+  const botResponse = data.choices[0].text.trim();
+
+  addMessageToChatbox('Chatbot: ' + botResponse);
 }
 
-function generateResponse(userInput) {
-  // Logica simples para gerar respostas
-  var responses = [
-    "Olá! Como posso ajudar?",
-    "Estou aqui para te ajudar!",
-    "Que interessante! Pode me contar mais?",
-    "Desculpe, não entendi. Pode reformular?",
-  ];
-  return responses[Math.floor(Math.random() * responses.length)];
-}
